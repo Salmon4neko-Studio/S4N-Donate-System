@@ -23,7 +23,11 @@ services:
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/donate
       - NEXT_PUBLIC_BASE_URL=http://localhost:3000
-      # 金流設定 (若留空則使用測試帳號，正式環境請務必填寫)
+      # 管理員設定
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=password
+      - JWT_SECRET=your_jwt_secret_here
+      # 金流設定 (非必填)
       - ECPAY_MERCHANT_ID=
       - ECPAY_HASH_KEY=
       - ECPAY_HASH_IV=
@@ -48,16 +52,19 @@ volumes:
 
 ## 環境變數說明
 
-| 變數名稱 | 說明 | 預設值 / 範例 |
-| --- | --- | --- |
-| `DATABASE_URL` | PostgreSQL 連線字串 | `postgresql://user:password@db:5432/donate` |
-| `NEXT_PUBLIC_BASE_URL` | 網站對外網址 (用於金流回調) | `http://localhost:3000` |
-| `ECPAY_MERCHANT_ID` | 綠界商店代號 | (測試帳號) |
-| `ECPAY_HASH_KEY` | 綠界 HashKey | (測試帳號) |
-| `ECPAY_HASH_IV` | 綠界 HashIV | (測試帳號) |
-| `OPAY_MERCHANT_ID` | 歐付寶商店代號 | (測試帳號) |
-| `OPAY_HASH_KEY` | 歐付寶 HashKey | (測試帳號) |
-| `OPAY_HASH_IV` | 歐付寶 HashIV | (測試帳號) |
+| 變數名稱 | 必填 | 說明 | 預設值 / 範例 |
+| --- | --- | --- | --- |
+| `DATABASE_URL` | 是 | PostgreSQL 連線字串 | `postgresql://user:password@db:5432/donate` |
+| `NEXT_PUBLIC_BASE_URL` | 是 | 網站對外網址 (用於金流回調) | `http://localhost:3000` |
+| `ADMIN_USERNAME` | 是 | 管理員帳號 | `admin` |
+| `ADMIN_PASSWORD` | 是 | 管理員密碼 | `password` |
+| `JWT_SECRET` | 是 | JWT 加密密鑰，用於身份驗證 | (請設定一個強隨機字串) |
+| `ECPAY_MERCHANT_ID` | 否 | 綠界商店代號 | - |
+| `ECPAY_HASH_KEY` | 否 | 綠界 HashKey | - |
+| `ECPAY_HASH_IV` | 否 | 綠界 HashIV | - |
+| `OPAY_MERCHANT_ID` | 否 | 歐付寶商店代號 | - |
+| `OPAY_HASH_KEY` | 否 | 歐付寶 HashKey | - |
+| `OPAY_HASH_IV` | 否 | 歐付寶 HashIV | - |
 
 ## 頁面路徑
 
@@ -69,4 +76,5 @@ volumes:
 ## 相關連結
 
 - [GitHub Repository](https://github.com/LokiSalmonNeko/s4n-donate-system)
-- [Zeabur Template](https://zeabur.com/templates/PZ7FR9)
+- [Docker Hub](https://hub.docker.com/r/lokisalmonneko/s4n-donate-system)
+- [Zeabur Template](https://zeabur.com/zh-TW/templates/PZ7FR9)

@@ -36,10 +36,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
         const data = await parseForm(req);
         console.log('ECPay Callback Data:', data);
 
+        const hashKey = process.env.ECPAY_HASH_KEY;
+        const hashIV = process.env.ECPAY_HASH_IV;
+
+        if (!hashKey || !hashIV) {
+            console.error('ECPay credentials not fully configured');
+            return res.status(500).send('0|ConfigurationError');
+        }
+
         const isValid = validateCheckMacValue(
             data,
-            process.env.ECPAY_HASH_KEY || 'spPjZn66i0OhqJsQ',
-            process.env.ECPAY_HASH_IV || 'hT5OJckN45isQTTs'
+            hashKey,
+            hashIV
         );
 
         if (!isValid) {

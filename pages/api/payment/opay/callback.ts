@@ -35,10 +35,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseS
         const data = await parseForm(req);
         console.log('OPay Callback Data:', data);
 
+        const hashKey = process.env.OPAY_HASH_KEY;
+        const hashIV = process.env.OPAY_HASH_IV;
+
+        if (!hashKey || !hashIV) {
+            console.error('OPay credentials not fully configured');
+            return res.status(500).send('0|ConfigurationError');
+        }
+
         const isValid = validateCheckMacValue(
             data,
-            process.env.OPAY_HASH_KEY || '5294y06JbISpM5x9', // O'Pay 測試 Key
-            process.env.OPAY_HASH_IV || 'v77hoKGq4kWxNNIS'  // O'Pay 測試 IV
+            hashKey,
+            hashIV
         );
 
         if (!isValid) {

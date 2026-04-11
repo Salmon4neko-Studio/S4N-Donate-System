@@ -14,27 +14,27 @@ spec:
     - type: STRING
       key: ECPAY_MERCHANT_ID
       name: ECPay Merchant ID
-      description: 綠界商店代號 (預設為測試帳號 3002599，若留空則使用預設值)
+      description: 綠界商店代號 (非必填)
     - type: STRING
       key: ECPAY_HASH_KEY
       name: ECPay Hash Key
-      description: 綠界 Hash Key (預設為測試帳號 spPjZn66i0OhqJsQ，若留空則使用預設值)
+      description: 綠界 Hash Key (非必填)
     - type: STRING
       key: ECPAY_HASH_IV
       name: ECPay Hash IV
-      description: 綠界 Hash IV (預設為測試帳號 hT5OJckN45isQTTs，若留空則使用預設值)
+      description: 綠界 Hash IV (非必填)
     - type: STRING
       key: OPAY_MERCHANT_ID
       name: O'Pay Merchant ID
-      description: 歐付寶商店代號 (預設為測試帳號 2000132，若留空則使用預設值)
+      description: 歐付寶商店代號 (非必填)
     - type: STRING
       key: OPAY_HASH_KEY
       name: O'Pay Hash Key
-      description: 歐付寶 Hash Key (預設為測試帳號 5294y06JbISpM5x9，若留空則使用預設值)
+      description: 歐付寶 Hash Key (非必填)
     - type: STRING
       key: OPAY_HASH_IV
       name: O'Pay Hash IV
-      description: 歐付寶 Hash IV (預設為測試帳號 v77hoKGq4kWxNNIS，若留空則使用預設值)
+      description: 歐付寶 Hash IV (非必填)
     - type: STRING
       key: ADMIN_USERNAME
       name: Admin Username
@@ -43,6 +43,10 @@ spec:
       key: ADMIN_PASSWORD
       name: Admin Password
       description: 後台管理員密碼
+    - type: PASSWORD
+      key: JWT_SECRET
+      name: JWT Secret
+      description: JWT 加密密鑰，用於身份驗證 (請設定一個強隨機字串)
   readme: |-
     # S4N Donate System
     這是一個開源的實況主贊助平台，支援 ECPay (綠界) 和 O'Pay (歐付寶) 金流，並提供 OBS 即時通知功能。
@@ -53,9 +57,11 @@ spec:
     - **實況主後台**：查看最近贊助紀錄，設定通知樣式 (圖片、音效、字型)。
     - **OBS 通知**：專屬的 Browser Source 網址，贊助成功後即時顯示動畫與播放音效。
     - **現代化日系 UI**：採用 **Tocas UI** 設計系統，提供柔和、現代的視覺體驗。
-    - **Docker 支援**：提供 Docker Image (`lokisalmonneko/s4n-donate-system`) 與 Docker Compose 配置。
+    - **Docker 支援**：提供 Docker Image ([lokisalmonneko/s4n-donate-system](https://hub.docker.com/r/lokisalmonneko/s4n-donate-system)) 與 Docker Compose 配置。
 
-    Gtihub: https://github.com/LokiSalmonNeko/s4n-donate-system
+    GitHub: https://github.com/LokiSalmonNeko/s4n-donate-system
+    Docker Hub: https://hub.docker.com/r/lokisalmonneko/s4n-donate-system
+    Zeabur Template: https://zeabur.com/zh-TW/templates/PZ7FR9
 
   services:
     - name: s4n-donate-system
@@ -90,6 +96,8 @@ spec:
             default: ${ADMIN_USERNAME}
           ADMIN_PASSWORD:
             default: ${ADMIN_PASSWORD}
+          JWT_SECRET:
+            default: ${JWT_SECRET}
 
     - name: postgres
       icon: https://raw.githubusercontent.com/zeabur/service-icons/main/marketplace/postgresql.svg
