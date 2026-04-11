@@ -28,11 +28,28 @@
 3. 依照提示填入環境變數。
     - 若您已有綠界或歐付寶帳號，請填入您的商店代號與金鑰。
     - **若留空，系統將自動使用測試帳號進行部署，方便您快速體驗。**
+    - **請務必設定 JWT_SECRET 環境變數，這是用於加密身份驗證 token 的密鑰。**
 4. 部署時，Zeabur會提供一組自訂子網域供您訪問。
 
 **注意**：
 - 資料庫 (PostgreSQL) 會自動建立並連接，無需額外設定。
 - 若您需要修改程式碼，請 Fork 本專案後使用 Git 部署方式。
+
+## 環境變數說明
+
+| 變數名稱 | 必填 | 說明 |
+|---------|------|------|
+| DATABASE_URL | 是 | 資料庫連線字串 |
+| ADMIN_USERNAME | 是 | 管理員帳號 |
+| ADMIN_PASSWORD | 是 | 管理員密碼 |
+| JWT_SECRET | 是 | JWT 加密密鑰，用於身份驗證 |
+| NEXT_PUBLIC_BASE_URL | 是 | 網站基礎 URL |
+| ECPAY_MERCHANT_ID | 否 | 綠界商店代號 |
+| ECPAY_HASH_KEY | 否 | 綠界 Hash Key |
+| ECPAY_HASH_IV | 否 | 綠界 Hash IV |
+| OPAY_MERCHANT_ID | 否 | 歐付寶商店代號 |
+| OPAY_HASH_KEY | 否 | 歐付寶 Hash Key |
+| OPAY_HASH_IV | 否 | 歐付寶 Hash IV |
 
 ## 自訂網域
 

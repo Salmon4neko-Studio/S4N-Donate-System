@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import jwt from 'jsonwebtoken';
 
 export async function POST(request: Request) {
     try {
@@ -7,6 +8,7 @@ export async function POST(request: Request) {
 
         const adminUsername = process.env.ADMIN_USERNAME;
         const adminPassword = process.env.ADMIN_PASSWORD;
+        const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-for-development-only';
 
         if (!adminUsername || !adminPassword) {
             return NextResponse.json(
@@ -16,11 +18,15 @@ export async function POST(request: Request) {
         }
 
         if (username === adminUsername && password === adminPassword) {
-            // Set a simple auth cookie
-            // In a real production app, use a signed JWT or session ID
-            // For this simple deployment, we'll check this cookie value in middleware
+            // 生成 JWT token
+            const token = jwt.sign(
+                { username: adminUsername },
+                JWT_SECRET,
+                { expiresIn: '7d' }
+            );
+
             const cookieStore = await cookies();
-            cookieStore.set('auth_token', 'authenticated', {
+            cookieStore.set('auth_token', token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 maxAge: 60 * 60 * 24 * 7, // 1 week
