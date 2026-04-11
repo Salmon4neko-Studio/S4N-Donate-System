@@ -39,6 +39,28 @@ export default function OBSPage() {
     const socketRef = useRef<Socket | null>(null);
 
     useEffect(() => {
+        // 確保頁面背景透明
+        document.documentElement.style.background = 'transparent';
+        document.body.style.background = 'transparent';
+        document.body.style.margin = '0';
+        document.body.style.padding = '0';
+        document.body.style.overflow = 'hidden';
+        
+        // 添加全域樣式以確保透明背景
+        const style = document.createElement('style');
+        style.innerHTML = `
+            html, body {
+                background: transparent !important;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+            #__next {
+                background: transparent !important;
+            }
+        `;
+        document.head.appendChild(style);
+
         // Fetch settings
         fetch('/api/settings')
             .then((res) => res.json())
@@ -49,6 +71,7 @@ export default function OBSPage() {
 
         return () => {
             if (socketRef.current) socketRef.current.disconnect();
+            document.head.removeChild(style);
         };
     }, []);
 
@@ -65,14 +88,14 @@ export default function OBSPage() {
 
         socketRef.current.on('new-donation', (donation: Donation) => {
             console.log('New donation received:', donation);
-            setQueue((prev) => [...prev, donation]);
+            setQueue((prevQueue: Donation[]) => [...prevQueue, donation]);
         });
     };
 
     useEffect(() => {
         if (!currentAlert && queue.length > 0 && settings) {
             playAlert(queue[0]);
-            setQueue((prev) => prev.slice(1));
+            setQueue((prevQueue: Donation[]) => prevQueue.slice(1));
         }
     }, [currentAlert, queue, settings]);
 
@@ -89,7 +112,7 @@ export default function OBSPage() {
             } else {
                 audioRef.current.src = settings.soundUrl;
             }
-            audioRef.current.play().catch((e) => console.error('Audio play failed:', e));
+            audioRef.current.play().catch((error: Error) => console.error('Audio play failed:', error));
         }
 
         setTimeout(() => {
@@ -103,8 +126,8 @@ export default function OBSPage() {
     if (!settings) return null;
 
     // Animation Styles Calculation
-    const getAnimationStyles = (): React.CSSProperties => {
-        const base: React.CSSProperties = {
+    const getAnimationStyles = () => {
+        const base = {
             transform: 'translate(0, 0) scale(1)',
             opacity: 1,
             transitionProperty: 'all',
@@ -112,46 +135,42 @@ export default function OBSPage() {
             transitionTimingFunction: isVisible
                 ? 'cubic-bezier(0.175, 0.885, 0.32, 1.275)' // easeOutBack (Entry)
                 : 'cubic-bezier(0.6, -0.28, 0.735, 0.045)', // easeInBack (Exit)
-        };
+        } as const;
 
         if (!isVisible) {
             base.opacity = 0;
             switch (settings.animationType) {
                 case 'slide-up':
-                    base.transform = 'translateY(2.5rem) scale(0.95)';
-                    break;
+                    return { ...base, transform: 'translateY(2.5rem) scale(0.95)' };
                 case 'slide-down':
-                    base.transform = 'translateY(-2.5rem) scale(0.95)';
-                    break;
+                    return { ...base, transform: 'translateY(-2.5rem) scale(0.95)' };
                 case 'zoom':
-                    base.transform = 'scale(0)';
-                    break;
+                    return { ...base, transform: 'scale(0)' };
                 case 'bounce':
-                    base.transform = 'scale(0.5)';
-                    break;
+                    return { ...base, transform: 'scale(0.5)' };
                 case 'fade':
                 default:
-                    // just opacity 0
-                    break;
+                    return base; // just opacity 0
             }
-        } else {
-            base.opacity = 1;
-            base.transform = 'translateY(0) scale(1)';
         }
+        
         return base;
     };
 
     // Positioning styles
     const getContainerStyle = () => {
-        const style: React.CSSProperties = {
+        const style = {
             display: 'flex',
             width: '100vw',
             height: '100vh',
             padding: '2rem',
-            boxSizing: 'border-box',
-            overflow: 'hidden',
+            boxSizing: 'border-box' as const,
+            overflow: 'hidden' as const,
             backgroundColor: 'transparent',
             minHeight: '100vh',
+            position: 'absolute' as const,
+            top: 0,
+            left: 0,
         };
 
         switch (settings.verticalAlign) {
@@ -181,7 +200,7 @@ export default function OBSPage() {
 
         return (
             <>
-                {parts.map((part, i) => (
+                {parts.map((part: string, i: number) => (
                     <span key={i}>
                         {part}
                         {i < parts.length - 1 && (
