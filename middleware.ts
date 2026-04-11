@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 export function middleware(request: NextRequest) {
     // 只保護 dashboard 路由
@@ -21,6 +21,12 @@ export function middleware(request: NextRequest) {
         try {
             // 驗證 JWT token
             const decoded = jwt.verify(authToken.value, JWT_SECRET);
+            
+            // Type guard: ensure decoded is a JwtPayload object, not a string
+            if (typeof decoded === 'string') {
+                throw new Error('Invalid token payload');
+            }
+            
             console.log('Token verified successfully:', { username: decoded.username });
             
             // 將用戶信息添加到請求頭，以便在API中使用
