@@ -28,11 +28,8 @@ export async function POST(request: Request) {
                 { expiresIn: '7d' }
             );
 
-            // 設置cookie
-            const cookieStore = cookies();
-            
-            // 確保cookie設置正確
-            cookieStore.set('auth_token', token, {
+            // 設置cookie - 直接使用 cookies() 而不是 await
+            cookies().set('auth_token', token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 maxAge: 60 * 60 * 24 * 7, // 1 week

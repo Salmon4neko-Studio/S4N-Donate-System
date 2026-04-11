@@ -4,8 +4,8 @@ import jwt from 'jsonwebtoken';
 
 export async function GET() {
     try {
-        const cookieStore = cookies();
-        const authToken = cookieStore.get('auth_token');
+        // 在最新版本的 Next.js 中，cookies() 不再返回 Promise
+        const authToken = cookies().get('auth_token');
         const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-for-development-only';
 
         if (!authToken) {
@@ -14,7 +14,7 @@ export async function GET() {
 
         try {
             // 驗證JWT令牌
-            const decoded = jwt.verify(authToken.value, JWT_SECRET);
+            const decoded = jwt.verify(authToken.value, JWT_SECRET) as { username: string };
             return NextResponse.json({ 
                 authenticated: true,
                 user: { username: decoded.username }
