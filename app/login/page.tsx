@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -8,28 +8,70 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [debugInfo, setDebugInfo] = useState('');
     const router = useRouter();
+
+    // 檢查是否已登入
+    useEffect(() => {
+        // 簡單檢查是否有cookie (僅用於UI顯示，實際驗證在服務器端進行)
+        const checkAuth = async () => {
+            try {
+                const res = await fetch('/api/auth/check', {
+                    method: 'GET',
+                    credentials: 'include', // 重要：包含cookies
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.authenticated) {
+                        router.push('/dashboard');
+                    }
+                }
+            } catch (err) {
+                console.error('Auth check error:', err);
+            }
+        };
+        
+        checkAuth();
+    }, [router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError('');
+        setDebugInfo('');
 
         try {
+            console.log('Submitting login form...');
+            
             const res = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
+                credentials: 'include', // 重要：包含cookies
             });
 
+            const data = await res.json();
+            
             if (res.ok) {
-                router.push('/dashboard');
+                console.log('Login successful, redirecting...');
+                setDebugInfo('登入成功，正在跳轉...');
+                
+                // 短暫延遲以確保cookie已設置
+                setTimeout(() => {
+                    router.push('/dashboard');
+                }, 500);
             } else {
-                const data = await res.json();
+                console.error('Login failed:', data);
                 setError(data.error || '登入失敗');
+                if (data.details) {
+                    setDebugInfo(`詳細錯誤: ${data.details}`);
+                }
             }
         } catch (err) {
+            console.error('Login request error:', err);
             setError('發生錯誤，請稍後再試');
+            setDebugInfo(`錯誤詳情: ${err instanceof Error ? err.message : String(err)}`);
         } finally {
             setLoading(false);
         }
@@ -77,6 +119,13 @@ export default function LoginPage() {
                                 <div className="column">
                                     <div className="ts-notice is-negative">
                                         <div className="content">{error}</div>
+                                    </div>
+                                </div>
+                            )}
+                            {debugInfo && (
+                                <div className="column">
+                                    <div className="ts-notice is-info">
+                                        <div className="content">{debugInfo}</div>
                                     </div>
                                 </div>
                             )}
