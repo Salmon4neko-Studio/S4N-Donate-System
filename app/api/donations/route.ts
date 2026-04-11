@@ -63,16 +63,17 @@ export async function POST(request: Request) {
       },
     });
 
-    // 準備支付參數
-    const merchantTradeDate = new Date().toLocaleString('zh-TW', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    }).replace(/\//g, '/');
+    // 準備支付參數 - 修正日期格式為 yyyy/MM/dd HH:mm:ss
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    
+    const merchantTradeDate = `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+    console.log('Generated MerchantTradeDate:', merchantTradeDate); // 記錄生成的日期格式以便調試
 
     const merchantTradeNo = donation.id.replace(/-/g, '').substring(0, 20);
 
@@ -116,7 +117,8 @@ export async function POST(request: Request) {
       );
 
       paymentParams = { ...baseParams, CheckMacValue: checkMacValue };
-      actionUrl = 'https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5'; // 正式環境
+      // 始終使用正式環境連結
+      actionUrl = 'https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5';
 
     } else if (paymentMethod === 'OPAY') {
       // O'Pay 歐付寶
@@ -149,8 +151,8 @@ export async function POST(request: Request) {
       );
 
       paymentParams = { ...baseParams, CheckMacValue: checkMacValue };
-      actionUrl = 'https://payment.opay.tw/Cashier/AioCheckOut/V5'; // 正式環境
-
+      // 始終使用正式環境連結
+      actionUrl = 'https://payment.opay.tw/Cashier/AioCheckOut/V5';
     } else {
       throw new ValidationError(`Invalid payment method: ${paymentMethod}`);
     }
