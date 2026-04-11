@@ -30,6 +30,11 @@ interface Donation {
     message?: string;
 }
 
+// 定義自己的 CSS 屬性類型，避免依賴 React.CSSProperties
+interface CSSProperties {
+    [key: string]: string | number | undefined;
+}
+
 export default function OBSPage() {
     const [settings, setSettings] = useState<AlertSettings | null>(null);
     const [currentAlert, setCurrentAlert] = useState<Donation | null>(null);
@@ -126,7 +131,7 @@ export default function OBSPage() {
     if (!settings) return null;
 
     // Animation Styles Calculation - 修正版本
-    const getAnimationStyles = () => {
+    const getAnimationStyles = (): CSSProperties => {
         const baseStyles = {
             transform: 'translate(0, 0) scale(1)',
             opacity: 1,
@@ -156,18 +161,18 @@ export default function OBSPage() {
         return baseStyles;
     };
 
-    // Positioning styles
-    const getContainerStyle = () => {
-        const style = {
+    // Positioning styles - 修正版本
+    const getContainerStyle = (): CSSProperties => {
+        const style: CSSProperties = {
             display: 'flex',
             width: '100vw',
             height: '100vh',
             padding: '2rem',
-            boxSizing: 'border-box' as const,
-            overflow: 'hidden' as const,
+            boxSizing: 'border-box',
+            overflow: 'hidden',
             backgroundColor: 'transparent',
             minHeight: '100vh',
-            position: 'absolute' as const,
+            position: 'absolute',
             top: 0,
             left: 0,
         };
