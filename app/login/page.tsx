@@ -24,6 +24,7 @@ export default function LoginPage() {
                 if (res.ok) {
                     const data = await res.json();
                     if (data.authenticated) {
+                        console.log('Already authenticated, redirecting to dashboard');
                         router.push('/dashboard');
                     }
                 }
@@ -57,10 +58,14 @@ export default function LoginPage() {
                 console.log('Login successful, redirecting...');
                 setDebugInfo('登入成功，正在跳轉...');
                 
-                // 短暫延遲以確保cookie已設置
-                setTimeout(() => {
-                    router.push('/dashboard');
-                }, 500);
+                // 強制重新載入頁面並跳轉到儀表板
+                // 這會繞過任何可能的路由快取問題
+                window.location.href = '/dashboard';
+                
+                // 如果上面的方法不起作用，也可以嘗試以下方法：
+                // setTimeout(() => {
+                //     router.push('/dashboard');
+                // }, 500);
             } else {
                 console.error('Login failed:', data);
                 setError(data.error || '登入失敗');
