@@ -125,9 +125,9 @@ export default function OBSPage() {
 
     if (!settings) return null;
 
-    // Animation Styles Calculation
+    // Animation Styles Calculation - 修正版本
     const getAnimationStyles = () => {
-        const base = {
+        const baseStyles = {
             transform: 'translate(0, 0) scale(1)',
             opacity: 1,
             transitionProperty: 'all',
@@ -135,26 +135,25 @@ export default function OBSPage() {
             transitionTimingFunction: isVisible
                 ? 'cubic-bezier(0.175, 0.885, 0.32, 1.275)' // easeOutBack (Entry)
                 : 'cubic-bezier(0.6, -0.28, 0.735, 0.045)', // easeInBack (Exit)
-        } as const;
+        };
 
         if (!isVisible) {
-            base.opacity = 0;
             switch (settings.animationType) {
                 case 'slide-up':
-                    return { ...base, transform: 'translateY(2.5rem) scale(0.95)' };
+                    return { ...baseStyles, opacity: 0, transform: 'translateY(2.5rem) scale(0.95)' };
                 case 'slide-down':
-                    return { ...base, transform: 'translateY(-2.5rem) scale(0.95)' };
+                    return { ...baseStyles, opacity: 0, transform: 'translateY(-2.5rem) scale(0.95)' };
                 case 'zoom':
-                    return { ...base, transform: 'scale(0)' };
+                    return { ...baseStyles, opacity: 0, transform: 'scale(0)' };
                 case 'bounce':
-                    return { ...base, transform: 'scale(0.5)' };
+                    return { ...baseStyles, opacity: 0, transform: 'scale(0.5)' };
                 case 'fade':
                 default:
-                    return base; // just opacity 0
+                    return { ...baseStyles, opacity: 0 };
             }
         }
         
-        return base;
+        return baseStyles;
     };
 
     // Positioning styles
