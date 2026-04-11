@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import { jwtVerify } from 'jose'; // 使用 jose 替代 jsonwebtoken，jose 與 Edge Runtime 兼容
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
     // 只保護 dashboard 路由
     if (request.nextUrl.pathname.startsWith('/dashboard')) {
         const authToken = request.cookies.get('auth_token');
@@ -19,19 +19,23 @@ export function middleware(request: NextRequest) {
         }
 
         try {
-            // 驗證 JWT token
-            const decoded = jwt.verify(authToken.value, JWT_SECRET);
+            // 使用 jose 驗證 JWT token
+            const encoder = new TextEncoder();
+            const secretKey = encoder.encode(JWT_SECRET);
             
-            // Type guard: ensure decoded is a JwtPayload object, not a string
-            if (typeof decoded === 'string') {
-                throw new Error('Invalid token payload');
-            }
+            const { payload } = await jwtVerify(
+                authToken.value,
+                secretKey
+            );
             
-            console.log('Token verified successfully:', { username: decoded.username });
+            console.log('Token verified successfully:', { 
+                username: payload.username,
+                pathname: request.nextUrl.pathname
+            });
             
             // 將用戶信息添加到請求頭，以便在API中使用
             const requestHeaders = new Headers(request.headers);
-            requestHeaders.set('x-user', JSON.stringify(decoded));
+            requestHeaders.set('x-user', JSON.stringify(payload));
             
             // 繼續請求，並附加修改後的請求頭
             return NextResponse.next({

@@ -23,9 +23,12 @@ export default function LoginPage() {
                 
                 if (res.ok) {
                     const data = await res.json();
+                    console.log('Auth check result:', data);
+                    
                     if (data.authenticated) {
                         console.log('Already authenticated, redirecting to dashboard');
-                        router.push('/dashboard');
+                        // 使用硬跳轉，繞過Next.js的路由系統
+                        window.location.href = '/dashboard';
                     }
                 }
             } catch (err) {
@@ -34,7 +37,7 @@ export default function LoginPage() {
         };
         
         checkAuth();
-    }, [router]);
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -53,19 +56,17 @@ export default function LoginPage() {
             });
 
             const data = await res.json();
+            console.log('Login response:', data);
             
             if (res.ok) {
                 console.log('Login successful, redirecting...');
                 setDebugInfo('登入成功，正在跳轉...');
                 
-                // 強制重新載入頁面並跳轉到儀表板
-                // 這會繞過任何可能的路由快取問題
-                window.location.href = '/dashboard';
-                
-                // 如果上面的方法不起作用，也可以嘗試以下方法：
-                // setTimeout(() => {
-                //     router.push('/dashboard');
-                // }, 500);
+                // 等待一小段時間以確保cookie已設置
+                setTimeout(() => {
+                    // 使用硬跳轉，繞過Next.js的路由系統
+                    window.location.href = '/dashboard';
+                }, 1000);
             } else {
                 console.error('Login failed:', data);
                 setError(data.error || '登入失敗');
@@ -80,6 +81,11 @@ export default function LoginPage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    // 添加一個直接跳轉的按鈕，用於測試
+    const forceRedirect = () => {
+        window.location.href = '/dashboard';
     };
 
     return (
@@ -142,6 +148,17 @@ export default function LoginPage() {
                                     登入
                                 </button>
                             </div>
+                            {debugInfo && debugInfo.includes('登入成功') && (
+                                <div className="column">
+                                    <button
+                                        className="ts-button is-fluid is-secondary"
+                                        type="button"
+                                        onClick={forceRedirect}
+                                    >
+                                        手動跳轉到儀表板
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </form>

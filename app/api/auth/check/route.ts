@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import jwt from 'jsonwebtoken';
+import { jwtVerify } from 'jose'; // 使用 jose 替代 jsonwebtoken
 
 export async function GET() {
     try {
@@ -13,17 +13,26 @@ export async function GET() {
         }
 
         try {
-            // 驗證JWT令牌
-            const decoded = jwt.verify(authToken.value, JWT_SECRET) as { username: string };
+            // 使用 jose 驗證 JWT token
+            const encoder = new TextEncoder();
+            const secretKey = encoder.encode(JWT_SECRET);
+            
+            const { payload } = await jwtVerify(
+                authToken.value,
+                secretKey
+            );
+            
             return NextResponse.json({ 
                 authenticated: true,
-                user: { username: decoded.username }
+                user: { username: payload.username }
             });
         } catch (error) {
             // 令牌無效
+            console.error('Token verification failed:', error);
             return NextResponse.json({ authenticated: false, error: 'Invalid token' });
         }
     } catch (error) {
+        console.error('Auth check error:', error);
         return NextResponse.json({ 
             authenticated: false, 
             error: 'Server error',
