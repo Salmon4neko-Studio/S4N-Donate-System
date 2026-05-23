@@ -59,9 +59,9 @@ spec:
     - **現代化日系 UI**：採用 **Tocas UI** 設計系統，提供柔和、現代的視覺體驗。
     - **Docker 支援**：提供 Docker Image ([lokisalmonneko/s4n-donate-system](https://hub.docker.com/r/lokisalmonneko/s4n-donate-system)) 與 Docker Compose 配置。
 
-    GitHub: https://github.com/LokiSalmonNeko/s4n-donate-system
-    Docker Hub: https://hub.docker.com/r/lokisalmonneko/s4n-donate-system
-    Zeabur Template: https://zeabur.com/zh-TW/templates/PZ7FR9
+    GitHub: https://github.com/LokiSalmonNeko/s4n-donate-system  
+    Docker Hub: https://hub.docker.com/r/lokisalmonneko/s4n-donate-system  
+    Zeabur Template: https://zeabur.com/zh-TW/templates/PZ7FR9  
 
   services:
     - name: s4n-donate-system
